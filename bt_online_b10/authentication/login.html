@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        #form-login {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            justify-content: center;
+        }
+
+        .title-input {
+            display: block;
+            margin-top: 10px;
+        }
+
+        #send {
+            width: 100px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="form-login">
+        <label for="username" class="title-input">Username:</label>
+        <input type="text" name="" id="username" placeholder="Nhập tài khoản">
+        <label for="password" class="title-input">Password:</label>
+        <input type="password" name="" id="password" placeholder="Nhập mật khẩu">
+        <button id="send">Đăng nhập</button>
+    </div>
+
+    <script>
+        document.querySelector('#send').addEventListener('click', () => {
+            let username = document.querySelector('#username').value;
+            let password = document.querySelector('#password').value;
+
+            let account = {
+                username,
+                password
+            }
+
+            let request = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(account)
+            }
+            fetch('http://localhost:3000/login', request)
+                .then(res => {
+                    if (res.status === 200) {
+                        alert('Đăng nhập thành công');
+                    } else if (res.status === 400) {
+                        alert('Tài khoản hoặc mật khẩu không đúng');
+                    }
+                })
+                .catch(err => console.error(err))
+        })
+    </script>
+</body>
+
+</html>

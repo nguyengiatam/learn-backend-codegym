@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {getOne, getAll} = require('./crud');
 
 mongoose.connect('mongodb://localhost/data-server');
 
@@ -13,6 +14,10 @@ const account = new Schema({
 
 const accountModel = mongoose.model('account', account);
 
-accountModel.find({})
-.then(data => console.log(data))
-.catch(err => console.error(err))
+getOne(accountModel, {username : 'nguyengiatam'})
+.then(data => {
+    console.log(data);
+})
+.catch(err => {
+    console.error(err);
+})

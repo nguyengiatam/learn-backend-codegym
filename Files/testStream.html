@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="outData"></div>
+    <script>
+        let run = true;
+        let nextStart = 0;
+        let dataCity = "";
+        async function callApi(start) {
+            const req = {
+                headers: {
+                    range: start,
+                }
+            }
+            let data = await fetch('/city', req);
+            console.log(data.status);
+            let value = await data.text();
+            dataCity += value;
+            if (data.status == 206) {
+                let range = data.headers.get('content-range');
+                console.log(range);
+                let first = range.indexOf('-') + 1;
+                let last = range.indexOf('/');
+                nextStart = Number(range.substring(first, last)) + 1;
+                return true;
+            }
+            console.log('done');
+            return false;
+        }
+
+        async function getData() {
+            while (run) {
+                run = await callApi(nextStart)
+            }
+        }
+
+        getData();
+    </script>
+</body>
+
+</html>
