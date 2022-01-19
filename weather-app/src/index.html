@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <style>
+        .seach {
+            width: 500px;
+        }
+
+        .setup {
+            display: flex;
+            width: 50%;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            width: 120px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .title{
+            width: 50px;
+        }
+
+        #input{
+            text-align: center;
+            border-radius: 10px;
+            border: solid, 1px, black;
+        }
+
+        #send{
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='seach'>
+        <div class="setup type">
+            <span class="title">Find: </span>
+            <div>
+                <select name="" class="option" id="seachType">
+                    <option value="findByName">By name</option>
+                    <option value="findById">By Id</option>
+                </select>
+            </div>
+        </div>
+        <div class="setup value">
+            <span class="title">Value: </span>
+            <div>
+                <select name="" class="option" id="seachValue">
+                    <option value="get-weather">All</option>
+                    <option value="temperature">Temperature</option>
+                    <option value="wind">Wind</option>
+                    <option value="weather">Weather</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="seach">
+        <input type="text" id="input">
+        <button id="send">Send</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        let outElement = document.querySelector('#result');
+        document.querySelector('#send').addEventListener('click', async () => {
+            outElement.innerHTML = '<h4>Loading...</h4>';
+            let dataInput = getInput();
+            let response = await fetch(dataInput[0], dataInput[1]);
+            let data = {'Message' : 'value does not exist'};
+            if(response.status == 200){
+                data = await response.json();
+            }
+            setOutData(data, dataInput[2]);
+        })
+
+        function getInput() {
+            let input = document.querySelector('#input').value;
+            let seachType = document.querySelector('#seachType');
+            let seachValue = document.querySelector('#seachValue');
+            let titleSeach = seachValue.options[seachValue.selectedIndex].text;
+            let api = '';
+            let request = {
+                headers: { 'Content-Type': 'application/json' },
+            };
+            if (seachType.value == 'findById') {
+                let query = `?id=${input}`;
+                request.method = 'GET';
+                api = `http://localhost:3005/find/${seachValue.value}${query}`;
+            } else {
+                request.method = 'POST';
+                api = `http://localhost:3005/find/${seachValue.value}`;
+                request.body = JSON.stringify({ 'name': `${input}` });
+            }
+            return [api, request, titleSeach];
+        }
+
+        function setOutData(data, title = 'Thông tin: ') {
+            let dataHeader = document.createElement('h3');
+            dataHeader.innerHTML = title;
+            outElement.innerHTML = '';
+            outElement.appendChild(dataHeader);
+            outElement.appendChild(outData(data));
+        }
+
+        function outData(data) {
+            let dataList = document.createElement('ul');
+            for (const key in data) {
+                if (typeof data[key] == 'object') {
+                    let li = document.createElement('li');
+                    li.innerHTML = key;
+                    dataList.appendChild(li);
+                    dataList.appendChild(outData(data[key]));
+                } else {
+                    let li = document.createElement('li');
+                    li.innerHTML = `${key}: ${data[key]}`;
+                    dataList.appendChild(li);
+                }
+            }
+            return dataList;
+        }
+    </script>
+</body>
+
+</html>
